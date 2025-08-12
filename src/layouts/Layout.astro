@@ -1,22 +1,31 @@
-<!doctype html>
-<html lang="en">
+---
+export interface Props {
+	title?: string;
+}
+
+const { title = 'Mi App' } = Astro.props;
+
+// Variables de entorno para el cliente
+const supabaseUrl = import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+---
+
+<!DOCTYPE html>
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content="Astro description">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<script define:vars={{supabaseUrl, supabaseAnonKey}}>
+			// Hacer las variables accesibles globalmente
+			window.SUPABASE_URL = supabaseUrl;
+			window.SUPABASE_ANON_KEY = supabaseAnonKey;
+		</script>
 	</head>
 	<body>
-		<slot />
+		<main>
+			<slot />
+		</main>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

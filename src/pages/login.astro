@@ -5,12 +5,18 @@ let error = '';
 <form id="loginForm">
   <input name="email" type="email" required />
   <input name="password" type="password" required />
-  <button type="submit">Iniciar sesión</button>
+  <button type="submit">Iniciar sesion</button>
 </form>
 <p id="errorMsg"></p>
 
-<script type="module">
-  import { supabase } from '../lib/supabase.js'; // Importa aquí para que sea cliente
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  
+  // Crear cliente Supabase directamente aquí
+  const supabase = createClient(
+    'https://puwbmsavutwyeeryaskd.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1d2Jtc2F2dXR3eWVlcnlhc2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTgyNTYsImV4cCI6MjA3MDU5NDI1Nn0.ds3Pv-SnxNOrXQfOIFtZ_1I_n5un443VoKt-aIMBroY'
+  );
 
   const form = document.getElementById('loginForm');
   const errorMsg = document.getElementById('errorMsg');
@@ -29,7 +35,9 @@ let error = '';
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      errorMsg.textContent = error.message;
+      if (errorMsg) {
+        errorMsg.textContent = error.message;
+      }
     } else {
       window.location.href = '/'; // Redirige si el login es correcto
     }

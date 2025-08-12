@@ -14,8 +14,14 @@ import Layout from '../layouts/Layout.astro';
 
   <button id="logoutBtn">Cerrar sesión</button>
 
-  <script type="module">
-    import { supabase } from '../lib/supabase';
+  <script>
+    import { createClient } from '@supabase/supabase-js';
+    
+    // Crear cliente Supabase directamente aquí
+    const supabase = createClient(
+      'https://puwbmsavutwyeeryaskd.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1d2Jtc2F2dXR3eWVlcnlhc2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTgyNTYsImV4cCI6MjA3MDU5NDI1Nn0.ds3Pv-SnxNOrXQfOIFtZ_1I_n5un443VoKt-aIMBroY'
+    );
 
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -26,7 +32,7 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
-    async function fetchNotes(userId) {
+    async function fetchNotes(userId: string) {
       const { data, error } = await supabase
         .from('notes')
         .select('content')
@@ -37,13 +43,15 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
-      renderNotes(data);
+      renderNotes(data || []);
     }
 
-    function renderNotes(notes) {
+    function renderNotes(notes: any[]) {
       const list = document.getElementById('notesList');
+      if (!list) return;
+      
       list.innerHTML = '';
-      notes.forEach(note => {
+      notes.forEach((note: any) => {
         const li = document.createElement('li');
         li.textContent = note.content;
         list.appendChild(li);
@@ -53,7 +61,10 @@ import Layout from '../layouts/Layout.astro';
     // Añadir nota
     document.getElementById('noteForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const noteInput = event.target.note;
+      const target = event.target as HTMLFormElement;
+      const noteInput = target.querySelector('[name="note"]') as HTMLInputElement;
+      if (!noteInput) return;
+      
       const content = noteInput.value;
 
       const { data: { session } } = await supabase.auth.getSession();
