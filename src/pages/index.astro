@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <h1>Mis Notas</h1>
+
+  <form id="noteForm">
+    <input type="text" name="note" placeholder="Escribe una nota..." required />
+    <button type="submit">Añadir</button>
+  </form>
+
+  <ul id="notesList"></ul>
+
+  <button id="logoutBtn">Cerrar sesión</button>
+
+  <script type="module">
+    import { supabase } from '../lib/supabase.js';
+
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/login';
+      } else {
+        fetchNotes(session.user.id);
+      }
+    }
+
+    async function fetchNotes(userId) {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('content')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      renderNotes(data);
+    }
+
+    function renderNotes(notes) {
+      const list = document.getElementById('notesList');
+      list.innerHTML = '';
+      notes.forEach(note => {
+        const li = document.createElement('li');
+        li.textContent = note.content;
+        list.appendChild(li);
+      });
+    }
+
+    // Añadir nota
+    document.getElementById('noteForm')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const noteInput = event.target.note;
+      const content = noteInput.value;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { error } = await supabase
+        .from('notes')
+        .insert({ user_id: session.user.id, content });
+
+      if (error) {
+        console.error(error);
+      } else {
+        noteInput.value = '';
+        fetchNotes(session.user.id);
+      }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = '/login';
+    });
+
+    checkAuth();
+  </script>
+</Layout>
