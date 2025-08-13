@@ -9,37 +9,4 @@ let error = '';
 </form>
 <p id="errorMsg"></p>
 
-<script>
-  import { createClient } from '@supabase/supabase-js';
-  
-  // Crear cliente Supabase directamente aquí
-  const supabase = createClient(
-    'https://puwbmsavutwyeeryaskd.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1d2Jtc2F2dXR3eWVlcnlhc2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMTgyNTYsImV4cCI6MjA3MDU5NDI1Nn0.ds3Pv-SnxNOrXQfOIFtZ_1I_n5un443VoKt-aIMBroY'
-  );
-
-  const form = document.getElementById('loginForm');
-  const errorMsg = document.getElementById('errorMsg');
-
-  form?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const emailInput = form.querySelector('[name="email"]');
-    const passwordInput = form.querySelector('[name="password"]');
-
-    if (!(emailInput instanceof HTMLInputElement) || !(passwordInput instanceof HTMLInputElement)) return;
-
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      if (errorMsg) {
-        errorMsg.textContent = error.message;
-      }
-    } else {
-      window.location.href = '/'; // Redirige si el login es correcto
-    }
-  });
-</script>
+<script src="/scripts/login.js" type="module"></script>
